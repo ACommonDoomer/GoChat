@@ -1,8 +1,8 @@
-//GoChat v1.0.1 by Blox
 package main
 
 
 import (
+	"bytes"
 	"io"
 	"log"
 	"net"
@@ -17,7 +17,7 @@ var clients []net.Conn
 
 func main() {
 	clients = make([]net.Conn, 0)
-	listenes, err := net.Listen("tcp", addr)
+	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatal("Can't listen on " + addr)
 		os.Exit(1)	
@@ -55,14 +55,14 @@ for {
 		 }
 
 	  }
-	  sendToOtherClients(data)
+	  sendToOtherClients(conn, data)
 	  data = make([]byte, 0)
    }
 }
 
-func sendToOtherClients(sender net.Conn, data []byte) {
+func sendToOtherClients(send net.Conn, data []byte) {
 	for i := 0; i < len(clients); i++ {
-		if clients[i] != sender {
+		if clients[i] != send {
 			clients[i].Write(data)
 		}
 	}
