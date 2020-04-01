@@ -1,7 +1,12 @@
-//GoChat v1.0.1 by Blox
 package main 
-
-import "bufio"
+import (
+	"bufio"
+	"bytes"
+	"net"
+	"fmt"
+	"os"
+	"io"
+)
 
 const addr = "127.0.0.1:3000"
 const bufferSize = 256
@@ -19,10 +24,10 @@ for nick == "" {
 	nick = string(buf)
 }
 
-var conn net.conn
+var conn net.Conn
 var err error
 for {
-	fmt.Printf("Conectando a %s...", addr)
+	fmt.Printf("Conectando a %s...\n", addr)
 conn, err = net.Dial("tcp", addr)
 if err == nil {
 	break
@@ -31,9 +36,9 @@ if err == nil {
 
 defer conn.Close()
 
-go reciveMessages()
+go reciveMessages(conn)
 
-handleConnection()
+handleConnection(conn)
 }
 
 func handleConnection(conn net.Conn) {
@@ -51,13 +56,13 @@ buffer := make([]byte, bufferSize)
 
 for {
 	for {
-		n, err:= conn.Read(buffer)
+		n, err := conn.Read(buffer)
 		if err == nil {
 			if err == io.EOF {
 				break
 			}
 		}
-		buffer = buters.Trim(buffer[:n], "\x00")
+		buffer = bytes.Trim(buffer[:n], "\x00")
 		data = append(data, buffer...)
 		if data[len(data)-1] == endLine {
 			break
